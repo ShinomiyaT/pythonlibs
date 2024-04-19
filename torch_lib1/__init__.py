@@ -21,13 +21,17 @@ from tqdm.notebook import tqdm
 
 # 損失関数値計算用
 def eval_loss(loader, device, net, criterion):
-  
+
     # DataLoaderから最初の1セットを取得する
     for images, labels in loader:
         break
 
     # デバイスの割り当て
-    inputs = images.to(device)
+    if isinstance(images, dict):
+        inputs = {key: value.to(device) for key, value in images.items()}
+    else:
+        inputs = images.to(device)
+
     labels = labels.to(device)
 
     # 予測値の計算
@@ -37,13 +41,13 @@ def eval_loss(loader, device, net, criterion):
     loss = criterion(outputs, labels)
 
     return loss
-  
+
 
 # 学習用関数
 def fit(net, optimizer, criterion, num_epochs, train_loader, test_loader, device, history):
 
     base_epochs = len(history)
-  
+
     for epoch in range(base_epochs, num_epochs+base_epochs):
         # 1エポックあたりの正解数(精度計算用)
         n_train_acc, n_val_acc = 0, 0
@@ -60,9 +64,12 @@ def fit(net, optimizer, criterion, num_epochs, train_loader, test_loader, device
             train_batch_size = len(labels)
             # 1エポックあたりのデータ累積件数
             n_train += train_batch_size
-    
+
             # GPUヘ転送
-            inputs = inputs.to(device)
+            if isinstance(inputs, dict):
+                inputs = {key: value.to(device) for key, value in inputs.items()}
+            else:
+                inputs = inputs.to(device)
             labels = labels.to(device)
 
             # 勾配の初期化
@@ -85,8 +92,8 @@ def fit(net, optimizer, criterion, num_epochs, train_loader, test_loader, device
 
             # 平均前の損失と正解数の計算
             # lossは平均計算が行われているので平均前の損失に戻して加算
-            train_loss += loss.item() * train_batch_size 
-            n_train_acc += (predicted == labels).sum().item() 
+            train_loss += loss.item() * train_batch_size
+            n_train_acc += (predicted == labels).sum().item()
 
         #予測フェーズ
         net.eval()
@@ -98,7 +105,10 @@ def fit(net, optimizer, criterion, num_epochs, train_loader, test_loader, device
             n_test += test_batch_size
 
             # GPUヘ転送
-            inputs_test = inputs_test.to(device)
+            if isinstance(inputs_test, dict):
+                inputs_test = {key: value.to(device) for key, value in inputs_test.items()}
+            else:
+                inputs_test = inputs_test.to(device)
             labels_test = labels_test.to(device)
 
             # 予測計算
@@ -106,7 +116,7 @@ def fit(net, optimizer, criterion, num_epochs, train_loader, test_loader, device
 
             # 損失計算
             loss_test = criterion(outputs_test, labels_test)
- 
+
             # 予測ラベル導出
             predicted_test = torch.max(outputs_test, 1)[1]
 
@@ -114,7 +124,7 @@ def fit(net, optimizer, criterion, num_epochs, train_loader, test_loader, device
             # lossは平均計算が行われているので平均前の損失に戻して加算
             val_loss +=  loss_test.item() * test_batch_size
             n_val_acc +=  (predicted_test == labels_test).sum().item()
-    
+
         # 精度計算
         train_acc = n_train_acc / n_train
         val_acc = n_val_acc / n_test
@@ -133,7 +143,7 @@ def fit(net, optimizer, criterion, num_epochs, train_loader, test_loader, device
 # 学習ログ解析
 def evaluate_history(history):
   #損失と精度の確認
-  print(f'初期状態: 損失: {history[0,3]:.5f} 精度: {history[0,4]:.5f}') 
+  print(f'初期状態: 損失: {history[0,3]:.5f} 精度: {history[0,4]:.5f}')
   print(f'最終状態: 損失: {history[-1,3]:.5f} 精度: {history[-1,4]:.5f}' )
 
   num_epochs = len(history)
