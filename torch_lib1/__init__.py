@@ -88,9 +88,9 @@ def fit(net, optimizer, criterion, num_epochs, train_loader, test_loader, device
             optimizer.step()
 
             # 予測ラベル導出
-            if cls_type = 'multi_class'
+            if cls_type == 'multi_class':
                 predicted = torch.max(outputs, 1)[1]
-            elif cls_type ='binary_class':
+            elif cls_type =='binary_class':
                 predicted = torch.where(outputs < 0.0, 0, 1)
 
             # 平均前の損失と正解数の計算
@@ -121,9 +121,9 @@ def fit(net, optimizer, criterion, num_epochs, train_loader, test_loader, device
             loss_test = criterion(outputs_test, labels_test)
 
             # 予測ラベル導出
-            if cls_type = 'multi_class'
+            if cls_type == 'multi_class':
                 predicted_test = torch.max(outputs_test, 1)[1]
-            elif cls_type ='binary_class':
+            elif cls_type =='binary_class':
                 predicted_test = torch.where(outputs_test < 0.0, 0, 1)
 
             #  平均前の損失と正解数の計算
