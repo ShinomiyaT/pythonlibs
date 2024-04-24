@@ -3,7 +3,7 @@
 # https://www.apache.org/licenses/LICENSE-2.0.html
 
 # ReadMe
-README = 'Common Library for PyTorch\nAuthor: M. Akaishi'
+README = 'Common Library for PyTorch'\nAuthor: T.Shiba'
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -44,7 +44,7 @@ def eval_loss(loader, device, net, criterion):
 
 
 # 学習用関数
-def fit(net, optimizer, criterion, num_epochs, train_loader, test_loader, device, history):
+def fit(net, optimizer, criterion, num_epochs, train_loader, test_loader, device, history, cls_type):
 
     base_epochs = len(history)
 
@@ -88,7 +88,10 @@ def fit(net, optimizer, criterion, num_epochs, train_loader, test_loader, device
             optimizer.step()
 
             # 予測ラベル導出
-            predicted = torch.max(outputs, 1)[1]
+            if cls_type = 'multi_class'
+                predicted = torch.max(outputs, 1)[1]
+            elif cls_type ='binary_class':
+                predicted = torch.where(outputs < 0.0, 0, 1)
 
             # 平均前の損失と正解数の計算
             # lossは平均計算が行われているので平均前の損失に戻して加算
@@ -118,7 +121,10 @@ def fit(net, optimizer, criterion, num_epochs, train_loader, test_loader, device
             loss_test = criterion(outputs_test, labels_test)
 
             # 予測ラベル導出
-            predicted_test = torch.max(outputs_test, 1)[1]
+            if cls_type = 'multi_class'
+                predicted_test = torch.max(outputs_test, 1)[1]
+            elif cls_type ='binary_class':
+                predicted_test = torch.where(outputs_test < 0.0, 0, 1)
 
             #  平均前の損失と正解数の計算
             # lossは平均計算が行われているので平均前の損失に戻して加算
