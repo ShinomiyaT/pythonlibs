@@ -66,10 +66,11 @@ def fit(net, optimizer, criterion, num_epochs, train_loader, test_loader, device
             n_train += train_batch_size
 
             # GPUヘ転送
-            if isinstance(inputs, dict):
-                inputs = {key: value.to(device) for key, value in inputs.items()}
-            else:
-                inputs = inputs.to(device)
+            for i in range(len(inputs)):
+                if isinstance(inputs[i], dict):
+                    inputs[i] = {key: value.to(device) for key, value in inputs[i].items()}
+                else:
+                    inputs[i] = inputs[i].to(device)
             labels = labels.to(device)
 
             # 勾配の初期化
